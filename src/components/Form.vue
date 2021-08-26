@@ -1,35 +1,53 @@
 <template>
   <div class="form-container">
-    <h2 class="form-heading">Создание клиента</h2>
-    <form class="form">
-      <fieldset>
+    <success-message @again="again" v-if="isFormSubmitted" />
+    <form class="form" @submit.prevent="onSubmit" v-else>
+      <h2 class="form-heading">Создание клиента</h2>
+      <fieldset :disabled="isFormSubmitting">
         <h3 class="section-heading">Личные данные</h3>
         <section>
-          <label for="surname">
+          <label for="lastName">
             Фамилия *
             <input
               type="text"
-              id="surname"
+              id="lastName"
               placeholder="Фамилия"
               aria-invalid="{}"
+              v-model="v$.form.lastName.$model"
             />
-            <ErrorMessage>Фамилия обязательно для заполения</ErrorMessage>
+            <ErrorMessage v-if="errors && v$.form.lastName.$invalid">
+              Фамилия обязательна для заполения
+            </ErrorMessage>
           </label>
-          <label for="name">
+          <label for="firstName">
             Имя *
-            <input type="text" id="name" placeholder="Имя" />
-            <ErrorMessage>Имя обязательно для заполения</ErrorMessage>
+            <input
+              type="text"
+              id="firstName"
+              placeholder="Имя"
+              v-model="v$.form.firstName.$model"
+            />
+            <ErrorMessage v-if="errors && v$.form.firstName.$invalid">
+              Имя обязательно для заполения
+            </ErrorMessage>
           </label>
 
-          <label for="middlename">
+          <label for="middleName">
             Отчество
-            <input type="text" id="middlename" placeholder="Отчество" />
+            <input
+              type="text"
+              id="middleName"
+              placeholder="Отчество"
+              v-model="v$.form.middleName.$model"
+            />
           </label>
 
           <label for="birthdate">
             Дата рождения *
-            <input type="date" id="birthdate" />
-            <ErrorMessage>Дата рождения обязательно для заполения</ErrorMessage>
+            <input type="date" id="birthdate" v-model="form.birthdate" />
+            <ErrorMessage v-if="errors && v$.form.birthdate.$invalid">
+              Дата рождения обязательна для заполения
+            </ErrorMessage>
           </label>
 
           <label for="phone">
@@ -38,13 +56,16 @@
               type="tel"
               id="phone"
               placeholder="+7__________"
-              pattern="\+7\s?[\(]{0,1}9[0-9]{2}[\)]{0,1}\s?\d{3}[-]{0,1}\d{2}[-]{0,1}\d{2}"
+              v-model="v$.form.phone.$model"
             />
+            <ErrorMessage v-if="form.phone !== '' && v$.form.phone.$invalid">
+              Введите правильный номер телефона
+            </ErrorMessage>
           </label>
 
           <label for="gender">
             Пол
-            <select id="gender">
+            <select id="gender" v-model="v$.form.gender.$model">
               <option value="female">Женский</option>
               <option value="male">Мужской</option>
             </select>
@@ -52,15 +73,26 @@
 
           <label for="clients">
             Группа клиентов *
-            <select id="clients" placeholder="Группа клиентов">
+            <select
+              id="clients"
+              placeholder="Группа клиентов"
+              v-model="v$.form.clients.$model"
+            >
               <option value="vip">VIP</option>
               <option value="problem">Проблемные</option>
               <option value="oms">ОМС</option>
             </select>
-            <ErrorMessage>Выберите группу клиентов</ErrorMessage>
+            <ErrorMessage v-if="errors && v$.form.clients.$invalid">
+              Выберите группу клиентов
+            </ErrorMessage>
           </label>
+
           <div class="checkbox">
-            <input type="checkbox" id="sendSMS" />
+            <input
+              type="checkbox"
+              id="sendSMS"
+              v-model="v$.form.sendSMS.$model"
+            />
             <label for="sendSMS">Не отправлять СМС</label>
           </div>
         </section>
@@ -69,32 +101,65 @@
         <section>
           <label for="zip">
             Индекс
-            <input type="number" id="zip" placeholder="Индекс" />
+            <input
+              type="number"
+              id="zip"
+              placeholder="Индекс"
+              v-model="v$.form.zip.$model"
+            />
           </label>
 
-          <label for="Country">
+          <label for="country">
             Страна
-            <input type="text" id="Country" placeholder="Страна" />
+            <input
+              type="text"
+              id="country"
+              placeholder="Страна"
+              v-model="v$.form.country.$model"
+            />
           </label>
 
           <label for="district">
             Область
-            <input type="text" id="district" placeholder="Область" />
+            <input
+              type="text"
+              id="district"
+              placeholder="Область"
+              v-model="v$.form.district.$model"
+            />
           </label>
 
           <label for="city">
             Город *
-            <input type="text" id="city" placeholder="Город" />
+            <input
+              type="text"
+              id="city"
+              placeholder="Город"
+              v-model="v$.form.city.$model"
+            />
+            <ErrorMessage v-if="errors && v$.form.city.$invalid">
+              Город обязателен для заполения
+            </ErrorMessage>
           </label>
 
           <label for="street">
             Улица
-            <input type="text" id="street" placeholder="Улица" />
+            <input
+              type="text"
+              id="street"
+              placeholder="Улица"
+              v-model="v$.form.street.$model"
+            />
           </label>
 
           <label for="house">
             Дом
-            <input type="number" id="house" placeholder="Дом" />
+            <input
+              type="number"
+              id="house"
+              placeholder="Дом"
+              v-model="v$.form.house.$model"
+            />
           </label>
         </section>
 
@@ -102,8 +167,12 @@
         <section>
           <label for="documentType">
             Тип документа
-            <select id="documentType" placeholder="Тип документа">
-              <option value="passport">Паспорт</option>
+            <select
+              id="documentType"
+              placeholder="Тип документа"
+              v-model="v$.form.documentType.$model"
+            >
+              <option default value="passport">Паспорт</option>
               <option value="birthdayDocument">Свидетельство о рождении</option>
               <option value="driving license">Вод. удостоверение</option>
             </select>
@@ -111,26 +180,45 @@
 
           <label for="serial">
             Серия
-            <input type="number" id="serial" placeholder="Серия" />
+            <input
+              type="number"
+              id="serial"
+              placeholder="Серия"
+              v-model="v$.form.serial.$model"
+            />
           </label>
 
           <label for="number">
             Номер
-            <input type="number" id="number" placeholder="Номер" />
+            <input
+              type="number"
+              id="number"
+              placeholder="Номер"
+              v-model="v$.form.number.$model"
+            />
           </label>
 
           <label for="byWhom">
             Кем выдан
-            <input type="text" id="byWhom" placeholder="Кем выдан" />
+            <input
+              type="text"
+              id="byWhom"
+              placeholder="Кем выдан"
+              v-model="v$.form.byWhom.$model"
+            />
           </label>
 
           <label for="date">
             Дата выдачи *
-            <input type="date" id="date" />
-            <ErrorMessage>Дата рождения обязательно для заполения</ErrorMessage>
+            <input type="date" id="date" v-model="v$.form.date.$model" />
+            <ErrorMessage v-if="errors && v$.form.date.$invalid">
+              Дата рождения обязательно для заполения
+            </ErrorMessage>
           </label>
         </section>
-        <button type="submit">Создать</button>
+        <button type="submit" :disabled="isFormSubmitting">
+          {{ isFormSubmitting ? "Создаeм..." : "Создать" }}
+        </button>
         <Legend />
       </fieldset>
     </form>
@@ -138,13 +226,100 @@
 </template>
 
 <script>
+import useVuelidate from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
 import Legend from "@/components/Legend.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
+import wait from "@/lib/wait.js";
+import SuccessMessage from "./SuccessMessage.vue";
+import initialState from "./initialState.js";
 
 export default {
   components: {
     Legend,
     ErrorMessage,
+    SuccessMessage,
+  },
+
+  setup() {
+    return { v$: useVuelidate() };
+  },
+  data() {
+    return {
+      form: {
+        firstName: "",
+        lastname: "",
+        middleName: "",
+        birthdate: "",
+        phone: "",
+        gender: "",
+        clients: "",
+        sendSMS: false,
+        zip: "",
+        country: "",
+        district: "",
+        city: "",
+        street: "",
+        house: "",
+        documentType: "",
+        serial: "",
+        number: "",
+        byWhom: "",
+        date: "",
+      },
+      isFormSubmitting: false,
+      isFormSubmitted: false,
+      errors: false,
+    };
+  },
+  validations() {
+    return {
+      form: {
+        firstName: { required },
+        lastName: { required },
+        middleName: "",
+        birthdate: { required },
+        phone: {
+          requiredIf(value) {
+            return value !== "";
+          },
+          validatePhone(phone) {
+            return /^((\+7|7|8)+([0-9]){10})$/gm.test(phone);
+          },
+        },
+        gender: "",
+        clients: { required },
+        sendSMS: false,
+        zip: "",
+        country: "",
+        district: "",
+        city: { required },
+        street: "",
+        house: "",
+        documentType: "",
+        serial: "",
+        number: "",
+        byWhom: "",
+        date: { required },
+      },
+    };
+  },
+
+  methods: {
+    async onSubmit(e) {
+      this.errors = this.v$.form.$invalid;
+      console.log(e);
+      if (this.errors === false) {
+        this.isFormSubmitting = true;
+        await wait(3000);
+        this.isFormSubmitted = true;
+        this.isFormSubmitting = false;
+        this.form = { ...initialState };
+      }
+    },
+    again() {
+      this.isFormSubmitted = false;
+    },
   },
 };
 </script>
