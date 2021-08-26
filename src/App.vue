@@ -32,18 +32,37 @@ html {
   font-size: 62.5%;
 }
 body {
-  font-family: "Cuprum", sans-serif;
+  font-family: "Ubuntu", sans-serif;
+  background: $lightGrey;
 }
-
 fieldset {
   border: none;
 }
 
+button,
+input,
+select {
+  font-family: inherit;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 .container {
-  height: 100vh;
-  background: $lightGrey;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 1rem 0;
+
+  @media only screen and (max-width: 700px) {
+    margin: 0;
+  }
 }
 </style>
