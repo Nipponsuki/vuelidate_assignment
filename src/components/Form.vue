@@ -3,7 +3,7 @@
     <success-message @again="again" v-if="isFormSubmitted" />
     <form class="form" @submit.prevent="onSubmit" v-else>
       <h2 class="form-heading">Создание клиента</h2>
-      <fieldset :disabled="isFormSubmitting">
+      <fieldset :disabled="isFormSubmitting" ref="fieldset">
         <h3 class="section-heading">Личные данные</h3>
         <section>
           <label for="lastName">
@@ -66,7 +66,7 @@
           <label for="gender">
             Пол
             <select id="gender" v-model="v$.form.gender.$model">
-              <option value="female">Женский</option>
+              <option selected value="female">Женский</option>
               <option value="male">Мужской</option>
             </select>
           </label>
@@ -172,7 +172,7 @@
               placeholder="Тип документа"
               v-model="v$.form.documentType.$model"
             >
-              <option default value="passport">Паспорт</option>
+              <option selected value="passport">Паспорт</option>
               <option value="birthdayDocument">Свидетельство о рождении</option>
               <option value="driving license">Вод. удостоверение</option>
             </select>
@@ -216,9 +216,9 @@
             </ErrorMessage>
           </label>
         </section>
-        <button type="submit" :disabled="isFormSubmitting">
+        <Button :type="'submit'" :disabled="isFormSubmitting">
           {{ isFormSubmitting ? "Создаeм..." : "Создать" }}
-        </button>
+        </Button>
         <Legend />
       </fieldset>
     </form>
@@ -232,13 +232,14 @@ import Legend from "@/components/Legend.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
 import wait from "@/lib/wait.js";
 import SuccessMessage from "./SuccessMessage.vue";
-import initialState from "./initialState.js";
+import Button from "./Button.vue";
 
 export default {
   components: {
     Legend,
     ErrorMessage,
     SuccessMessage,
+    Button,
   },
 
   setup() {
@@ -252,7 +253,7 @@ export default {
         middleName: "",
         birthdate: "",
         phone: "",
-        gender: "",
+        gender: "female",
         clients: "",
         sendSMS: false,
         zip: "",
@@ -261,7 +262,7 @@ export default {
         city: "",
         street: "",
         house: "",
-        documentType: "",
+        documentType: "passport",
         serial: "",
         number: "",
         byWhom: "",
@@ -280,11 +281,8 @@ export default {
         middleName: "",
         birthdate: { required },
         phone: {
-          requiredIf(value) {
-            return value !== "";
-          },
           validatePhone(phone) {
-            return /^((\+7|7|8)+([0-9]){10})$/gm.test(phone);
+            return /^$|^((\+7|7|8)+([0-9]){10})$/gm.test(phone);
           },
         },
         gender: "",
@@ -306,15 +304,13 @@ export default {
   },
 
   methods: {
-    async onSubmit(e) {
+    async onSubmit() {
       this.errors = this.v$.form.$invalid;
-      console.log(e);
       if (this.errors === false) {
         this.isFormSubmitting = true;
         await wait(3000);
         this.isFormSubmitted = true;
         this.isFormSubmitting = false;
-        this.form = { ...initialState };
       }
     },
     again() {
@@ -417,35 +413,6 @@ export default {
 
     @media only screen and (max-width: 700px) {
       width: 100%;
-    }
-  }
-
-  button {
-    border: none;
-    background: #5dbe88;
-    border-radius: 4px;
-    font-size: 1.6rem;
-    color: #fff;
-    padding: 1% 3%;
-    cursor: pointer;
-    transition: background 0.4s ease;
-    margin: 2rem 0;
-    width: 10rem;
-    height: 3rem;
-
-    &:hover {
-      background: #3fb674;
-    }
-
-    &:disabled {
-      background: #c5ccd7;
-      pointer-events: none;
-      cursor: not-allowed;
-    }
-
-    @media only screen and (max-width: 400px) {
-      width: 100%;
-      height: 3rem;
     }
   }
 }

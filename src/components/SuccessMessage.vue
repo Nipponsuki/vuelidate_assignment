@@ -1,11 +1,21 @@
 <template>
   <div>
-    <h2 class="form-heading">Клиент успешно создан</h2>
-    <button @click="$emit('again')">again</button>
+    <h2 class="heading">Клиент успешно создан</h2>
+    <Button @click="$emit('again')">Создать</Button>
   </div>
 </template>
 
 <script>
-export default {};
+import Button from "@/components/Button.vue";
+
+export default {
+  components: {
+    Button,
+  },
+};
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.heading {
+  font-size: 3.2rem;
+}
+</style>
