@@ -1,21 +1,19 @@
 <template>
   <div>
     <h2 class="heading">Клиент успешно создан</h2>
-    <Button @click="$emit('again')">Создать</Button>
+    <p>Перезагрузите страницу для повторного создания</p>
   </div>
 </template>
 
 <script>
-import Button from "@/components/Button.vue";
-
-export default {
-  components: {
-    Button,
-  },
-};
+export default {};
 </script>
 <style lang="scss" scoped>
 .heading {
   font-size: 3.2rem;
+}
+
+p {
+  font-size: 2rem;
 }
 </style>

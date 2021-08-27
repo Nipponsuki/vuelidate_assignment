@@ -1,6 +1,6 @@
 <template>
   <div class="form-container">
-    <success-message @again="again" v-if="isFormSubmitted" />
+    <SuccessMessage v-if="isFormSubmitted" />
     <form class="form" @submit.prevent="onSubmit" v-else>
       <h2 class="form-heading">Создание клиента</h2>
       <fieldset :disabled="isFormSubmitting" ref="fieldset">
@@ -12,7 +12,7 @@
               type="text"
               id="lastName"
               placeholder="Фамилия"
-              aria-invalid="{}"
+              :aria-invalid="errors && v$.form.lastName.$invalid"
               v-model="v$.form.lastName.$model"
             />
             <ErrorMessage v-if="errors && v$.form.lastName.$invalid">
@@ -26,6 +26,7 @@
               id="firstName"
               placeholder="Имя"
               v-model="v$.form.firstName.$model"
+              :aria-invalid="errors && v$.form.firstName.$invalid"
             />
             <ErrorMessage v-if="errors && v$.form.firstName.$invalid">
               Имя обязательно для заполения
@@ -44,7 +45,12 @@
 
           <label for="birthdate">
             Дата рождения *
-            <input type="date" id="birthdate" v-model="form.birthdate" />
+            <input
+              type="date"
+              id="birthdate"
+              v-model="form.birthdate"
+              :aria-invalid="errors && v$.form.birthdate.$invalid"
+            />
             <ErrorMessage v-if="errors && v$.form.birthdate.$invalid">
               Дата рождения обязательна для заполения
             </ErrorMessage>
@@ -57,6 +63,7 @@
               id="phone"
               placeholder="+7__________"
               v-model="v$.form.phone.$model"
+              :aria-invalid="form.phone !== '' && v$.form.phone.$invalid"
             />
             <ErrorMessage v-if="form.phone !== '' && v$.form.phone.$invalid">
               Введите правильный номер телефона
@@ -77,6 +84,7 @@
               id="clients"
               placeholder="Группа клиентов"
               v-model="v$.form.clients.$model"
+              :aria-invalid="errors && v$.form.clients.$invalid"
             >
               <option value="vip">VIP</option>
               <option value="problem">Проблемные</option>
@@ -136,6 +144,7 @@
               id="city"
               placeholder="Город"
               v-model="v$.form.city.$model"
+              :aria-invalid="errors && v$.form.city.$invalid"
             />
             <ErrorMessage v-if="errors && v$.form.city.$invalid">
               Город обязателен для заполения
@@ -210,7 +219,12 @@
 
           <label for="date">
             Дата выдачи *
-            <input type="date" id="date" v-model="v$.form.date.$model" />
+            <input
+              type="date"
+              id="date"
+              v-model="v$.form.date.$model"
+              :aria-invalid="errors && v$.form.date.$invalid"
+            />
             <ErrorMessage v-if="errors && v$.form.date.$invalid">
               Дата рождения обязательно для заполения
             </ErrorMessage>
@@ -311,10 +325,10 @@ export default {
         await wait(3000);
         this.isFormSubmitted = true;
         this.isFormSubmitting = false;
+        this.$nextTick(() => {
+          this.v$.$reset();
+        });
       }
-    },
-    again() {
-      this.isFormSubmitted = false;
     },
   },
 };
