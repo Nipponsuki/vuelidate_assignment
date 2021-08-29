@@ -59,10 +59,10 @@
           <label for="phone">
             Номер телефона
             <input
+              v-model="v$.form.phone.$model"
               type="tel"
               id="phone"
               placeholder="+7__________"
-              v-model="v$.form.phone.$model"
               :aria-invalid="form.phone !== '' && v$.form.phone.$invalid"
             />
             <ErrorMessage v-if="form.phone !== '' && v$.form.phone.$invalid">
@@ -72,24 +72,31 @@
 
           <label for="gender">
             Пол
-            <select id="gender" v-model="v$.form.gender.$model">
-              <option selected value="female">Женский</option>
-              <option value="male">Мужской</option>
-            </select>
+            <Multiselect
+              id="gender"
+              v-model="v$.form.gender.$model"
+              :options="{ female: 'Женский', male: 'Мужской' }"
+              class="multiselect-custom"
+              placeholder="Выберите пол"
+              :disabled="isFormSubmitting"
+            ></Multiselect>
           </label>
 
           <label for="clients">
             Группа клиентов *
-            <select
+            <Multiselect
+              :options="{ vip: 'VIP', problem: 'Проблемные', oms: 'ОМС' }"
               id="clients"
-              placeholder="Группа клиентов"
               v-model="v$.form.clients.$model"
               :aria-invalid="errors && v$.form.clients.$invalid"
-            >
-              <option value="vip">VIP</option>
-              <option value="problem">Проблемные</option>
-              <option value="oms">ОМС</option>
-            </select>
+              placeholder="Выберите группу клиентов"
+              class="multiselect-custom multiselect-option-custom"
+              :disabled="isFormSubmitting"
+              noResultsText="Нет результатов"
+              mode="tags"
+              :createTag="true"
+            ></Multiselect>
+
             <ErrorMessage v-if="errors && v$.form.clients.$invalid">
               Выберите группу клиентов
             </ErrorMessage>
@@ -176,15 +183,18 @@
         <section>
           <label for="documentType">
             Тип документа
-            <select
+            <Multiselect
               id="documentType"
-              placeholder="Тип документа"
               v-model="v$.form.documentType.$model"
-            >
-              <option selected value="passport">Паспорт</option>
-              <option value="birthdayDocument">Свидетельство о рождении</option>
-              <option value="driving license">Вод. удостоверение</option>
-            </select>
+              class="multiselect-custom"
+              :disabled="isFormSubmitting"
+              :options="{
+                passport: 'Паспорт',
+                birthdayDoc: 'Свидетельство о рождении',
+                driversLic: 'Вод. удостоверение',
+              }"
+              placeholder="Выберите тип документа"
+            ></Multiselect>
           </label>
 
           <label for="serial">
@@ -242,11 +252,15 @@
 <script>
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
+import Multiselect from "@vueform/multiselect";
+import "@vueform/multiselect/themes/default.css";
+
 import Legend from "@/components/Legend.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
-import wait from "@/lib/wait.js";
 import SuccessMessage from "./SuccessMessage.vue";
 import Button from "./Button.vue";
+
+import wait from "@/lib/wait.js";
 
 export default {
   components: {
@@ -254,6 +268,7 @@ export default {
     ErrorMessage,
     SuccessMessage,
     Button,
+    Multiselect,
   },
 
   setup() {
@@ -261,6 +276,7 @@ export default {
   },
   data() {
     return {
+      clientsOptions: ["VIP", "Проблемные", "OМС"],
       form: {
         firstName: "",
         lastname: "",
@@ -268,7 +284,7 @@ export default {
         birthdate: "",
         phone: "",
         gender: "female",
-        clients: "",
+        clients: null,
         sendSMS: false,
         zip: "",
         country: "",
@@ -321,6 +337,7 @@ export default {
     async onSubmit() {
       this.errors = this.v$.form.$invalid;
       if (this.errors === false) {
+        console.log(this.form);
         this.isFormSubmitting = true;
         await wait(3000);
         this.isFormSubmitted = true;
@@ -427,6 +444,30 @@ export default {
 
     @media only screen and (max-width: 700px) {
       width: 100%;
+    }
+  }
+
+  .multiselect-custom {
+    --ms-font-size: 1.4rem;
+    --ms-border-color: #d5d7db;
+    --ms-option-font-size: 1.4rem;
+    --ms-bg-disabled: #eceff3;
+    --ms-option-py: 0.7rem;
+
+    height: 4.4rem;
+    width: 28.2rem;
+    margin: 0;
+    margin-bottom: 1rem;
+
+    &:focus {
+      border-color: #25a1fb;
+      outline: none;
+      border-width: 1px;
+      box-shadow: none;
+    }
+
+    @media only screen and (max-width: 700px) {
+      width: 102.5%;
     }
   }
 }
